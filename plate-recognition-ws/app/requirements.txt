@@ -1,0 +1,10 @@
+Flask==1.0.4
+requests==2.22.0
+Werkzeug==0.16.1
+jinja2==2.10.3
+markupsafe==1.1.1
+click==6.7
+itsdangerous==1.1.0
+urllib3==1.25.11
+chardet==3.0.4
+certifi==2019.11.28
