@@ -8,3 +8,4 @@ itsdangerous==1.1.0
 urllib3==1.25.11
 chardet==3.0.4
 certifi==2019.11.28
+gunicorn==19.9.0
