@@ -3,3 +3,5 @@
 
 # Ignore workspace file
 *.code-workspace
+
+.DS_Store
