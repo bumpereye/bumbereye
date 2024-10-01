@@ -1,0 +1,14 @@
+services:
+  plate-recognition-ws:
+    build:
+      context: ./plate-recognition-ws
+      dockerfile: Dockerfile
+    image: plate-recognition-ws
+    container_name: plate-recognition-ws
+    ports:
+      - '6000:5000'
+    volumes:
+      - ./plate-recognition-ws/app:/app
+    environment:
+      - ENV=development
+    restart: always
