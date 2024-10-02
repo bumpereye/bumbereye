@@ -12,6 +12,8 @@ services:
     environment:
       - ENV=development
     restart: always
+    depends_on:
+      - minio
 
   # blob storage
   minio:
