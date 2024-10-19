@@ -5,7 +5,11 @@ import { StorageService } from '../storage/storage.service';
 export class PlatesService {
   constructor(private readonly storageService: StorageService) {}
 
-  async uploadPlatePhoto(file: Express.Multer.File) {
-    return this.storageService.uploadFile(file);
+  async getPlatePhotoUrl(file: Express.Multer.File) {
+    const { originalname } = file;
+
+    await this.storageService.uploadFile(file);
+
+    return this.storageService.getObjectUrl(originalname);
   }
 }
