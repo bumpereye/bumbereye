@@ -1,19 +1,19 @@
 from flask import Flask, jsonify, request
-from utils import download_image, cleanup, recognize_plate
+from utils import generate_file_name, cleanup, recognize_plate
 
 app = Flask(__name__)
 
 @app.route('/recognize', methods=['POST'])
 def recognize():
     try:
-        data = request.get_json()
+        file = request.files.get('file')
 
-        if not data or 'url' not in data:
-            return jsonify({'error': 'No URL provided'}), 400
+        if not file:
+            return jsonify({'error': 'No file provided'}), 400
 
-        url = data['url']
+        file_name = generate_file_name(file.filename)
 
-        file_name = download_image(url)
+        file.save(file_name)
 
         recognition_results = recognize_plate(file_name)
 
