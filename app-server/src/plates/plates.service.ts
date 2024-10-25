@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { StorageService } from '../storage/storage.service';
+import { RabbitMQService } from 'src/rabbitmq/rabbitmq.service';
+
+const eventName = 'UPLOAD_IMAGE';
 
 @Injectable()
 export class PlatesService {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(private readonly rabbitMQService: RabbitMQService) {}
 
-  async getPlatePhotoUrl(file: Express.Multer.File) {
-    const { originalname } = file;
+  async sendImageToQueue(file: Express.Multer.File) {
+    const fileData = file.buffer.toString('base64');
 
-    await this.storageService.uploadFile(file);
+    const message = {
+      filename: file.originalname,
+      mimetype: file.mimetype,
+      data: fileData,
+    };
 
-    return this.storageService.getObjectUrl(originalname);
+    await this.rabbitMQService.sendMessage(eventName, message);
   }
 }

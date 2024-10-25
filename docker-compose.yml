@@ -25,3 +25,15 @@ services:
     volumes:
       - ./minio-data:/data
     command: server /data --console-address ":9001"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672' # RabbitMQ main port
+      - '15672:15672' # RabbitMQ management plugin
+    environment:
+      RABBITMQ_DEFAULT_USER: user # Default username
+      RABBITMQ_DEFAULT_PASS: password # Default password
+    volumes:
+      - ./rabbitmq_data:/var/lib/rabbitmq

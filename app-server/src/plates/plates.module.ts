@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { PlatesController } from './plates.controller';
 import { PlatesService } from './plates.service';
-import { StorageModule } from '../storage/storage.module';
-import { PlateRecognitionWsModule } from 'src/plate-recognition-ws/plate-recognition-ws.module';
+import { PlateRecognitionWsModule } from '../plate-recognition-ws/plate-recognition-ws.module';
+import { RabbitMQService } from '../rabbitmq/rabbitmq.service';
 
 @Module({
-  imports: [StorageModule, PlateRecognitionWsModule],
+  imports: [PlateRecognitionWsModule],
   controllers: [PlatesController],
-  providers: [PlatesService],
+  providers: [PlatesService, RabbitMQService],
 })
 export class PlatesModule {}

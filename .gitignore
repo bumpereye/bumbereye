@@ -11,6 +11,7 @@
 .DS_Store
 __pycache__/
 minio-data/
+rabbitmq_data/
 
 dist/
 node_modules/

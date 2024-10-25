@@ -4,10 +4,8 @@ import {
   PutObjectCommand,
   HeadBucketCommand,
   CreateBucketCommand,
-  GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 @Injectable()
 export class StorageService {
@@ -40,36 +38,22 @@ export class StorageService {
     }
   }
 
-  async uploadFile(file: Express.Multer.File) {
+  async uploadFile(message) {
     const bucket = this.configService.get('MINIO_BUCKET');
 
     await this.ensureBucketExists(bucket);
 
+    const { filename, mimetype, data } = message;
+
+    const buffer = Buffer.from(data, 'base64');
+
     const uploadParams = {
       Bucket: bucket,
-      Key: file.originalname,
-      Body: file.buffer,
-      ContentType: file.mimetype,
+      Key: filename,
+      Body: buffer,
+      ContentType: mimetype,
     };
 
     return this.s3.send(new PutObjectCommand(uploadParams));
-  }
-
-  async getObjectUrl(key: string): Promise<string> {
-    const bucket = this.configService.get('MINIO_BUCKET');
-
-    const command = new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    });
-
-    // Generate a signed URL
-    const signedUrl = await getSignedUrl(this.s3, command, {
-      expiresIn: 3600, // URL expiry time in seconds (1 hour in this case)
-    });
-
-    console.log('Signed URL:', signedUrl);
-
-    return signedUrl;
   }
 }
