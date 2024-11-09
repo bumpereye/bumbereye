@@ -12,6 +12,7 @@
 __pycache__/
 minio-data/
 rabbitmq_data/
+mongo_data/
 
 dist/
 node_modules/

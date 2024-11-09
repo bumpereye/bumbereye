@@ -1,5 +1,4 @@
-// rabbitmq.service.ts
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { OnModuleInit } from '@nestjs/common';
 import {
   ClientProxy,
   ClientProxyFactory,
@@ -8,11 +7,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
-@Injectable()
 export class RabbitMQService implements OnModuleInit {
   private client: ClientProxy;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    protected readonly configService: ConfigService,
+    protected readonly queueName: string,
+  ) {}
 
   onModuleInit() {
     const rabbitmqUrl = this.configService.get('MESSAGE_BROKER_URL');
@@ -21,20 +22,16 @@ export class RabbitMQService implements OnModuleInit {
       transport: Transport.RMQ,
       options: {
         urls: [rabbitmqUrl],
-        queue: 'images_queue',
+        queue: this.queueName,
         queueOptions: { durable: true },
       },
     });
   }
 
-  // Send a message to RabbitMQ
   async sendMessage(pattern: string, data: any) {
-    console.log('Sending message:', pattern, data);
-
     await firstValueFrom(this.client.send(pattern, data));
   }
 
-  // Emit an event to RabbitMQ (e.g., for pub/sub patterns)
   emitEvent(pattern: string, data: any) {
     return this.client.emit(pattern, data);
   }

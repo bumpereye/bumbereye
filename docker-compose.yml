@@ -37,3 +37,11 @@ services:
       RABBITMQ_DEFAULT_PASS: password # Default password
     volumes:
       - ./rabbitmq_data:/var/lib/rabbitmq
+
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    ports:
+      - '27018:27017'
+    volumes:
+      - ./mongo_data:/data/db
