@@ -43,7 +43,7 @@ export class AuthService {
 
     const owner = await this.ownersService.getById(id);
 
-    if (!owner.active) {
+    if (!owner?.active) {
       throw new BadRequestException('Owner not found');
     }
 

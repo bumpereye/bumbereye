@@ -27,7 +27,7 @@ export class JwtOwnerStrategy extends PassportStrategy(
   async validate(req: Request, payload: OwnerJwtPayload) {
     const owner = await this.authService.validateOwnerJwtPayload(payload);
 
-    if (!owner.active) {
+    if (!owner?.active) {
       throw new UnauthorizedException('Invalid token');
     }
 

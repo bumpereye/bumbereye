@@ -10,13 +10,14 @@ export class ImageService extends RabbitMQService {
     super(configService, imageQueueName);
   }
 
-  async uploadImage(file: Express.Multer.File) {
+  async uploadImage(file: Express.Multer.File, metadata: Record<string, any>) {
     const fileData = file.buffer.toString('base64');
 
     const message = {
       filename: file.originalname,
       mimetype: file.mimetype,
       data: fileData,
+      metadata,
     };
 
     await this.sendMessage(ImageEvents.UPLOAD_IMAGE, message);

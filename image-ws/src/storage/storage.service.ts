@@ -43,7 +43,7 @@ export class StorageService {
 
     await this.ensureBucketExists(bucket);
 
-    const { filename, mimetype, data } = message;
+    const { filename, mimetype, data, metadata } = message;
 
     const buffer = Buffer.from(data, 'base64');
 
@@ -52,6 +52,7 @@ export class StorageService {
       Key: filename,
       Body: buffer,
       ContentType: mimetype,
+      Metadata: metadata,
     };
 
     return this.s3.send(new PutObjectCommand(uploadParams));

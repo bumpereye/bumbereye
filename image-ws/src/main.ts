@@ -6,8 +6,6 @@ async function bootstrap() {
   const rabbitMQUrl =
     process.env.MESSAGE_BROKER_URL || 'amqp://user:password@localhost:5672';
 
-  console.log('RabbitMQ URL:', rabbitMQUrl);
-
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {

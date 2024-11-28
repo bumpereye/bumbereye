@@ -20,11 +20,11 @@ import { Plate } from './plates.schema';
 import { AddPlateRequestDto } from './dto/add-plate-request.dto';
 import { UpdatePlateRequestDto } from './dto/update-plate-request.dto';
 
-@UseGuards(JwtOwnerGuard)
 @Controller('plates')
 export class PlatesController {
   constructor(private readonly platesService: PlatesService) {}
 
+  @UseGuards(JwtOwnerGuard)
   @Get()
   async getOwnersPlates(@Request() req: ExpressRequest): Promise<Plate[]> {
     const ownerId = req.owner.id;
@@ -32,6 +32,7 @@ export class PlatesController {
     return this.platesService.getPlatesByOwnerId(ownerId);
   }
 
+  @UseGuards(JwtOwnerGuard)
   @Post()
   async addPlate(
     @Request() req: ExpressRequest,
@@ -43,6 +44,7 @@ export class PlatesController {
     return this.platesService.addPlate(licensePlate, ownerId);
   }
 
+  @UseGuards(JwtOwnerGuard)
   @Patch(':plateId')
   async updatePlate(
     @Param('plateId') plateId: string,
@@ -53,6 +55,7 @@ export class PlatesController {
     return this.platesService.updatePlate(plateId, licensePlate);
   }
 
+  @UseGuards(JwtOwnerGuard)
   @Delete(':plateId')
   async deletePlate(@Param('plateId') plateId: string): Promise<string> {
     return this.platesService.deletePlate(plateId);

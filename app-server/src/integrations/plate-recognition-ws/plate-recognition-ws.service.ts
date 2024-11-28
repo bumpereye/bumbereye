@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import * as FormData from 'form-data';
 import { BaseWebService } from '../base-web-service/base-web-service.service';
+import { Metadata, RecognizePlateResponseDTO } from './dto/recognize-plate.dto';
 
 @Injectable()
 export class PlateRecognitionWsService extends BaseWebService {
@@ -15,9 +16,19 @@ export class PlateRecognitionWsService extends BaseWebService {
     super(httpService, baseUrl);
   }
 
+  convertMetadata(metadata: Metadata) {
+    const { candidates, coordinates, region } = metadata;
+
+    return {
+      candidates: JSON.stringify(candidates),
+      coordinates: JSON.stringify(coordinates),
+      region,
+    };
+  }
+
   async recognizePlate(
     file: Express.Multer.File,
-  ): Promise<{ licensePlate: string }> {
+  ): Promise<RecognizePlateResponseDTO> {
     try {
       const formData = new FormData();
 
@@ -26,7 +37,16 @@ export class PlateRecognitionWsService extends BaseWebService {
         contentType: file.mimetype,
       });
 
-      return this.post('/recognize', formData, formData.getHeaders());
+      const result = await this.post(
+        '/recognize',
+        formData,
+        formData.getHeaders(),
+      );
+
+      return {
+        ...result,
+        metadata: this.convertMetadata(result.metadata),
+      };
     } catch (error) {
       console.error(error);
     }

@@ -52,16 +52,15 @@ export class PlatesService {
   ): Promise<Plate> {
     const results = await this.plateRecognitionWsService.recognizePlate(file);
 
-    await this.imageService.uploadImage(file);
+    const { plate, metadata } = results;
+
+    await this.imageService.uploadImage(file, metadata);
 
     const device = await this.devicesService.getById(deviceId);
-    const { ownerId } = device;
-    const { licensePlate } = results;
 
-    const ownersPlate = await this.findByOwnerIdAndLicensePlate(
-      ownerId,
-      licensePlate,
-    );
+    const { ownerId } = device;
+
+    const ownersPlate = await this.findByOwnerIdAndLicensePlate(ownerId, plate);
 
     if (!ownersPlate) {
       throw new NotFoundException('Plate for this owner not found');
