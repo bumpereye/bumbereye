@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from utils import generate_file_name, cleanup, recognize_plate
+from utils import generate_file_name, cleanup, recognize_plate, transform_response
 
 app = Flask(__name__)
 
@@ -17,9 +17,11 @@ def recognize():
 
         recognition_results = recognize_plate(file_name)
 
+        result = transform_response(recognition_results)
+
         cleanup(file_name)
 
-        return jsonify(recognition_results), 200
+        return jsonify(result), 200
 
     except Exception as e:
         cleanup(file_name)
