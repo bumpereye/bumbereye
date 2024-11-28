@@ -12,8 +12,6 @@ services:
     environment:
       - ENV=development
     restart: always
-    depends_on:
-      - minio
 
   # blob storage
   minio:
@@ -45,3 +43,43 @@ services:
       - '27018:27017'
     volumes:
       - ./mongo_data:/data/db
+
+  app-server:
+    build:
+      context: ./app-server
+      dockerfile: Dockerfile
+    image: app-server
+    container_name: app-server
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      JWT_SECRET: c6bc685865d8c732a5aa521d21728e3e6f17e36754cc997d7e8e170667259d2bf743cd095060d7a4bebe12ed1382d6f86cfb8ab5183a217447a7cbf49a685734
+      PLATE_RECOGNITION_WS_URL: http://plate-recognition-ws:5000
+      MESSAGE_BROKER_URL: amqp://user:password@rabbitmq:5672
+      DATABASE_URL: mongodb://mongodb:27017
+      DATABASE_NAME: bumbereye
+      ACCESS_TOKEN_VALIDITY_DURATION_IN_SEC: 3600
+    restart: always
+    depends_on:
+      - rabbitmq
+      - mongodb
+
+  image-ws:
+    build:
+      context: ./image-ws
+      dockerfile: Dockerfile
+    image: image-ws
+    container_name: image-ws
+    environment:
+      MINIO_ENDPOINT: minio # The MinIO server address (or IP)
+      MINIO_PORT: 9000 # The MinIO server port
+      MINIO_ACCESS_KEY: minioadmin # MinIO Access Key
+      MINIO_SECRET_KEY: minioadmin # MinIO Secret Key
+      MINIO_BUCKET: bumbereye # Your MinIO bucket name
+      MINIO_USE_SSL: false
+      MESSAGE_BROKER_URL: amqp://user:password@rabbitmq:5672
+    restart: always
+    depends_on:
+      - minio
+      - rabbitmq

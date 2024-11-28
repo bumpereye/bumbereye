@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { OwnersService } from '../owners/owners.service';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { Owner } from '../owners/owners.shema';
