@@ -13,7 +13,11 @@ def recognize():
 
         file_name = generate_file_name(file.filename)
 
-        file.save(file_name)
+        with open(file_name, 'wb') as f:
+            chunk = file.stream.read(4096)
+            while chunk:
+                f.write(chunk)
+                chunk = file.stream.read(4096)
 
         recognition_results = recognize_plate(file_name)
 

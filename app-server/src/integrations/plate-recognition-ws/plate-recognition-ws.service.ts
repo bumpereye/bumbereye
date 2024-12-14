@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
+import { Readable } from 'stream';
 import * as FormData from 'form-data';
 import { BaseWebService } from '../base-web-service/base-web-service.service';
 import { Metadata, RecognizePlateResponseDTO } from './dto/recognize-plate.dto';
@@ -32,7 +33,9 @@ export class PlateRecognitionWsService extends BaseWebService {
     try {
       const formData = new FormData();
 
-      formData.append('file', file.buffer, {
+      const fileStream = Readable.from(file.buffer);
+
+      formData.append('file', fileStream, {
         filename: file.originalname,
         contentType: file.mimetype,
       });
