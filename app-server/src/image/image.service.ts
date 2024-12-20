@@ -3,6 +3,7 @@ import { RabbitMQService } from 'src/integrations/rabbitmq/rabbitmq.service';
 import { ConfigService } from '@nestjs/config';
 import { imageQueueName } from './constants';
 import { ImageEvents } from './types/image-events.types';
+import { Readable } from 'stream';
 
 @Injectable()
 export class ImageService extends RabbitMQService {
@@ -11,12 +12,17 @@ export class ImageService extends RabbitMQService {
   }
 
   async uploadImage(file: Express.Multer.File, metadata: Record<string, any>) {
-    const fileData = file.buffer.toString('base64');
+    const fileStream = Readable.from(file.buffer);
+
+    let data = '';
+    for await (const chunk of fileStream) {
+      data += chunk.toString('base64');
+    }
 
     const message = {
       filename: file.originalname,
       mimetype: file.mimetype,
-      data: fileData,
+      data,
       metadata,
     };
 
