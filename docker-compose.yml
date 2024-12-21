@@ -60,6 +60,7 @@ services:
       DATABASE_URL: mongodb://mongodb:27017
       DATABASE_NAME: bumbereye
       ACCESS_TOKEN_VALIDITY_DURATION_IN_SEC: 3600
+      IMAGE_SAVE_ENABLED: true
     restart: always
     depends_on:
       - rabbitmq
