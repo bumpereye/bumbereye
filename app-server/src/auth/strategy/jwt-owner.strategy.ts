@@ -1,33 +1,25 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, ExtractJwt } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { StrategyType } from '../types/strategy-type.types';
+import { StrategyType } from '../enums/strategy-type.enum';
 import { AuthService } from '../auth.service';
-import { OwnerJwtPayload } from '../types/owner-jwt-payload.types';
+import { OwnerJwtPayload } from '../types/owner-jwt-payload.type';
 import { Request } from 'express';
+import { Owner } from '../../owners/owners.shema';
+import { JwtBaseStrategy } from './jwt-base.strategy';
 
 @Injectable()
-export class JwtOwnerStrategy extends PassportStrategy(
-  Strategy,
-  StrategyType.JwtOwner,
-) {
+export class JwtOwnerStrategy extends JwtBaseStrategy<OwnerJwtPayload, Owner> {
   constructor(
-    private readonly configService: ConfigService,
-    private authService: AuthService,
+    configService: ConfigService,
+    private readonly authService: AuthService,
   ) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_SECRET'),
-      passReqToCallback: true,
-    });
+    super(configService, StrategyType.JwtOwner);
   }
 
-  async validate(req: Request, payload: OwnerJwtPayload) {
+  async validate(req: Request, payload: OwnerJwtPayload): Promise<Owner> {
     const owner = await this.authService.validateOwnerJwtPayload(payload);
 
-    if (!owner?.active) {
+    if (!owner || !owner.active) {
       throw new UnauthorizedException('Invalid token');
     }
 

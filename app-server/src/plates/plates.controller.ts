@@ -10,6 +10,8 @@ import {
   Delete,
   UseGuards,
   Request,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PlatesService } from './plates.service';
@@ -45,12 +47,11 @@ export class PlatesController {
   })
   @Get()
   async getOwnersPlates(@Request() req: ExpressRequest): Promise<Plate[]> {
-    const ownerId = req.owner.id;
-
-    return this.platesService.getPlatesByOwnerId(ownerId);
+    return this.platesService.getPlatesByOwnerId(req.owner.id);
   }
 
   @UseGuards(JwtOwnerGuard)
+  @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'Add a new plate for the authenticated owner' })
   @ApiBody({ type: AddPlateRequestDto })
   @ApiOkResponse({
@@ -62,10 +63,7 @@ export class PlatesController {
     @Request() req: ExpressRequest,
     @Body() body: AddPlateRequestDto,
   ): Promise<Plate> {
-    const ownerId = req.owner.id;
-    const { licensePlate } = body;
-
-    return this.platesService.addPlate(licensePlate, ownerId);
+    return this.platesService.addPlate(body.licensePlate, req.owner.id);
   }
 
   @UseGuards(JwtOwnerGuard)
@@ -81,9 +79,7 @@ export class PlatesController {
     @Param('plateId') plateId: string,
     @Body() body: UpdatePlateRequestDto,
   ): Promise<Plate> {
-    const { licensePlate } = body;
-
-    return this.platesService.updatePlate(plateId, licensePlate);
+    return this.platesService.updatePlate(plateId, body.licensePlate);
   }
 
   @UseGuards(JwtOwnerGuard)
@@ -112,8 +108,6 @@ export class PlatesController {
     @UploadedFile() file: Express.Multer.File,
     @Request() req: ExpressRequest,
   ): Promise<Plate> {
-    const deviceId = req.device.id;
-
-    return this.platesService.recognizePlate(deviceId, file);
+    return this.platesService.recognizePlate(req.device, file);
   }
 }

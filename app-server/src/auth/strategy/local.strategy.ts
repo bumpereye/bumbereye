@@ -4,7 +4,7 @@ import { Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
 import { Owner } from '../../owners/owners.shema';
 import { Request } from 'express';
-import { StrategyType } from '../types/strategy-type.types';
+import { StrategyType } from '../enums/strategy-type.enum';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(

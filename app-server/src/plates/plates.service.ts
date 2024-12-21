@@ -2,15 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Plate } from './plates.schema';
 import { Model } from 'mongoose';
-import { DevicesService } from '../devices/devices.service';
 import { PlateRecognitionWsService } from 'src/integrations/plate-recognition-ws/plate-recognition-ws.service';
 import { ImageService } from 'src/image/image.service';
+import { Device } from 'src/devices/devices.shema';
 
 @Injectable()
 export class PlatesService {
   constructor(
     @InjectModel(Plate.name) private plateModel: Model<Plate>,
-    private readonly devicesService: DevicesService,
     private readonly plateRecognitionWsService: PlateRecognitionWsService,
     private readonly imageService: ImageService,
   ) {}
@@ -30,7 +29,13 @@ export class PlatesService {
   }
 
   async deletePlate(plateId: string): Promise<string> {
-    await this.plateModel.deleteOne({ id: plateId }).exec();
+    const deleteResult = await this.plateModel
+      .deleteOne({ id: plateId })
+      .exec();
+
+    if (deleteResult.deletedCount === 0) {
+      throw new NotFoundException('Plate not found');
+    }
 
     return 'OK';
   }
@@ -47,20 +52,18 @@ export class PlatesService {
   }
 
   async recognizePlate(
-    deviceId: string,
+    device: Device,
     file: Express.Multer.File,
   ): Promise<Plate> {
-    const results = await this.plateRecognitionWsService.recognizePlate(file);
-
-    const { plate, metadata } = results;
+    const { plate, metadata } =
+      await this.plateRecognitionWsService.recognizePlate(file);
 
     await this.imageService.uploadImage(file, metadata);
 
-    const device = await this.devicesService.getById(deviceId);
-
-    const { ownerId } = device;
-
-    const ownersPlate = await this.findByOwnerIdAndLicensePlate(ownerId, plate);
+    const ownersPlate = await this.findByOwnerIdAndLicensePlate(
+      device.ownerId,
+      plate,
+    );
 
     if (!ownersPlate) {
       throw new NotFoundException('Plate for this owner not found');

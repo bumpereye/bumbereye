@@ -5,7 +5,7 @@ import {
   Transport,
 } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 export class RabbitMQService implements OnModuleInit {
   private client: ClientProxy;
@@ -28,11 +28,11 @@ export class RabbitMQService implements OnModuleInit {
     });
   }
 
-  async sendMessage(pattern: string, data: any) {
+  async sendMessage(pattern: string, data: any): Promise<any> {
     await firstValueFrom(this.client.send(pattern, data));
   }
 
-  emitEvent(pattern: string, data: any) {
+  emitEvent(pattern: string, data: any): Observable<any> {
     return this.client.emit(pattern, data);
   }
 }

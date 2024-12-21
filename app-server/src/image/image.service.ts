@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { RabbitMQService } from 'src/integrations/rabbitmq/rabbitmq.service';
 import { ConfigService } from '@nestjs/config';
 import { imageQueueName } from './constants';
-import { ImageEvents } from './types/image-events.types';
+import { ImageEvents } from './enums/image-events.enum';
 import { Readable } from 'stream';
 
 @Injectable()
@@ -11,7 +11,18 @@ export class ImageService extends RabbitMQService {
     super(configService, imageQueueName);
   }
 
-  async uploadImage(file: Express.Multer.File, metadata: Record<string, any>) {
+  isSaveEnabled(): boolean {
+    return this.configService.get<boolean>('IMAGE_SAVE_ENABLED');
+  }
+
+  async uploadImage(
+    file: Express.Multer.File,
+    metadata: Record<string, any>,
+  ): Promise<void> {
+    if (!this.isSaveEnabled()) {
+      return;
+    }
+
     const fileStream = Readable.from(file.buffer);
 
     let data = '';

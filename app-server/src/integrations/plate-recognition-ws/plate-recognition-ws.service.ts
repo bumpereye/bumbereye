@@ -4,7 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { Readable } from 'stream';
 import * as FormData from 'form-data';
 import { BaseWebService } from '../base-web-service/base-web-service.service';
-import { Metadata, RecognizePlateResponseDTO } from './dto/recognize-plate.dto';
+import { RecognizePlateResponseDTO } from './dto/recognize-plate-request.dto';
+import { Metadata } from './types/metadata.type';
 
 @Injectable()
 export class PlateRecognitionWsService extends BaseWebService {

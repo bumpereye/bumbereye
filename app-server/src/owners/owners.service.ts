@@ -13,7 +13,10 @@ export class OwnersService {
   }
 
   create(payload: CreateOwnerRequestDto): Promise<Owner> {
-    return this.ownerModel.create(payload);
+    return this.ownerModel.create({
+      ...payload,
+      active: true,
+    });
   }
 
   update(ownerId: string, firstName: string, lastName: string): Promise<Owner> {
@@ -28,7 +31,7 @@ export class OwnersService {
       .exec();
   }
 
-  findOneByEmail(email: string): Promise<Owner> {
+  findByEmail(email: string): Promise<Owner> {
     return this.ownerModel.findOne({ email }).exec();
   }
 }

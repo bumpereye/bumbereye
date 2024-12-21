@@ -8,11 +8,9 @@ export class BaseWebService {
   ) {}
 
   async post(endpoint: string, body: any, headers: any): Promise<any> {
-    const response = await lastValueFrom(
+    const { data } = await lastValueFrom(
       this.httpService.post(`${this.baseUrl}${endpoint}`, body, headers),
     );
-
-    const { data } = response;
 
     return data;
   }

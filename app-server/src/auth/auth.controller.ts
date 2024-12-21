@@ -1,13 +1,20 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Request,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from './decorators/public.decorator';
 import { RegisterRequestDto } from './dto/register-request.dto';
-import { RegisterResponseDto } from './dto/register-response.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
 import { Request as ExpressRequest } from 'express';
 import { ApiTags, ApiOperation, ApiBody, ApiOkResponse } from '@nestjs/swagger';
 import { ApiLoginBody } from './decorators/api-login-body.decorator';
+import { AccessTokenResponse } from './dto/access-token-response.dto';
 
 @ApiTags('Auth')
 @Public()
@@ -20,23 +27,24 @@ export class AuthController {
   @ApiLoginBody()
   @ApiOkResponse({
     description: 'Access token',
-    type: LoginResponseDto,
+    type: AccessTokenResponse,
   })
   @Post('login')
-  async login(@Request() req: ExpressRequest): Promise<LoginResponseDto> {
+  async login(@Request() req: ExpressRequest): Promise<AccessTokenResponse> {
     return this.authService.login(req.owner);
   }
 
+  @UsePipes(new ValidationPipe())
   @ApiOperation({ summary: 'Register a new user' })
   @ApiBody({ type: RegisterRequestDto })
   @ApiOkResponse({
     description: 'Access token',
-    type: RegisterResponseDto,
+    type: AccessTokenResponse,
   })
   @Post('register')
   async register(
     @Body() registerBody: RegisterRequestDto,
-  ): Promise<RegisterResponseDto> {
+  ): Promise<AccessTokenResponse> {
     return await this.authService.register(registerBody);
   }
 }
