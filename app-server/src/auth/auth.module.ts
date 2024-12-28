@@ -8,9 +8,11 @@ import { AuthController } from './auth.controller';
 import { JwtOwnerStrategy } from './strategy/jwt-owner.strategy';
 import { JwtDeviceStrategy } from './strategy/jwt-device.strategy';
 import { DevicesModule } from 'src/devices/devices.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
+    PassportModule,
     OwnersModule,
     DevicesModule,
     JwtModule.registerAsync({

@@ -1,25 +1,30 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy, ExtractJwt } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { StrategyType } from '../enums/strategy-type.enum';
 import { DeviceJwtPayload } from '../types/device-jwt-payload.type';
 import { AuthService } from '../auth.service';
 import { Request } from 'express';
-import { JwtBaseStrategy } from './jwt-base.strategy';
-import { Device } from 'src/devices/devices.shema';
 
 @Injectable()
-export class JwtDeviceStrategy extends JwtBaseStrategy<
-  DeviceJwtPayload,
-  Device
-> {
+export class JwtDeviceStrategy extends PassportStrategy(
+  Strategy,
+  StrategyType.JwtDevice,
+) {
   constructor(
-    configService: ConfigService,
-    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+    private authService: AuthService,
   ) {
-    super(configService, StrategyType.JwtDevice);
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: configService.get('JWT_SECRET'),
+      passReqToCallback: true,
+    });
   }
 
-  async validate(req: Request, payload: DeviceJwtPayload): Promise<Device> {
+  async validate(req: Request, payload: DeviceJwtPayload) {
     const device = await this.authService.validateDeviceJwtPayload(payload);
 
     if (!device) {
